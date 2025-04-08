@@ -1,30 +1,32 @@
-[tool.poetry]
+[project]
 name = "src"
 version = "0.1.0"
 description = "An example package for the OSIS Reproducibility Workshop."
 authors = [
-    "Emanuel Sommer <emanuel.sommer@stat.uni-muenchen.de>",
-    "Tobias Weber <tobias.weber@stat.uni-muenchen.de>",
-    "Lisa Wimmer <lisa.wimmer@stat.uni-muenchen.de>"
+    { name = "Emanuel Sommer", email = "emanuel.sommer@stat.uni-muenchen.de" },
+    { name = "Tobias Weber", email = "tobias.weber@stat.uni-muenchen.de" },
+    { name = "Lisa Wimmer", email = "lisa.wimmer@stat.uni-muenchen.de" },
 ]
-license = "MIT"
+requires-python = "~=3.10"
 readme = "README.md"
+license = "MIT"
+dependencies = [
+    "fire==0.6.0",
+    "matplotlib==3.8.3",
+    "nptyping==2.5.0",
+    "numpy==1.26.4",
+    "pyyaml==6.0.1",
+    "types-pyyaml>=6.0.12.20240311,<7",
+    "myst-parser>=2.0.0,<3",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-fire = "0.6.0"
-matplotlib = "3.8.3"
-nptyping = "2.5.0"
-numpy = "1.26.4"
-pyyaml = "6.0.1"
-types-pyyaml = "^6.0.12.20240311"
-myst-parser = "^2.0.0"
-
-[tool.poetry.group.dev.dependencies]
-sphinx-autodoc-typehints = "^2.0.0"
-sphinx-rtd-theme = "^2.0.0"
-coverage = "^7.5.0"
+[dependency-groups]
+dev = [
+    "sphinx-autodoc-typehints>=2.0.0,<3",
+    "sphinx-rtd-theme>=2.0.0,<3",
+    "coverage>=7.5.0,<8",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

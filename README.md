@@ -16,9 +16,9 @@ Hi there! Here is the right place for a brief introduction to the project. The D
 
 ## Installation
 
-- Setup a virtual environment with `python -m venv venv`
-- Activate the virtual environment with `source venv/bin/activate`
-- Install the project with poetry `poetry install` (Have poetry installed)
+- Create a virtual environment with `uv venv`
+- Activate the virtual environment with `source .venv/bin/activate` (Linux/macOS) or `.venv\Scripts\activate` (Windows)
+- Install the project with `uv pip install -e .`
 
 ## Usage
 
