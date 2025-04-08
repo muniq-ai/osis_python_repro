@@ -9,8 +9,8 @@ from src.utils import read_yml
 class ModelType(Enum):
     """Enumeration class representing different types of models."""
 
-    LINEAR: str = 'linear'
-    POLYNOMIAL: str = 'polynomial'
+    LINEAR = 'linear'
+    POLYNOMIAL = 'polynomial'
 
 
 @dataclass
