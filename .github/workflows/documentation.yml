@@ -32,7 +32,7 @@ jobs:
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
 
       - name: Install project and Sphinx dependencies
-        run: uv pip install -e . sphinx sphinx-rtd-theme
+        run: uv pip install -e . sphinx sphinx-rtd-theme sphinx-autodoc-typehints
 
 
       - name: Install pandoc
