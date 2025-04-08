@@ -27,17 +27,12 @@ jobs:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-${{ hashFiles('**/uv.lock') }}
 
-      - name: Set up virtual environment
+      - name: Set up virtual environment and install deps
         run: |
           uv venv .venv
           echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
-
-      - name: Sync dependencies
-        run: uv pip sync
-
-      - name: Install local project and dev tools
-        run: uv pip install -e . flake8 mypy pydocstyle coverage
+          uv pip install -e . flake8 mypy pydocstyle coverage
 
       - name: Run tests with coverage
         run: |
