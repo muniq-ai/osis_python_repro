@@ -18,8 +18,8 @@ jobs:
         run: |
           uv venv
           source .venv/bin/activate
-          uv pip install -e .
-          uv pip install sphinx sphinx-rtd-theme
+          uv pip install -e . --system
+          uv pip install sphinx sphinx-rtd-theme --system
       - name: Install pandoc
         run: |
           sudo apt-get install pandoc

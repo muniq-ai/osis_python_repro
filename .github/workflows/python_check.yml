@@ -70,4 +70,6 @@ jobs:
 
     - name: Run Pydocstyle
       if: ${{ always() }}
-      run: pydocstyle --ignore-decorators=property src
+      run: |
+        uv pip install pydocstyle
+        pydocstyle --ignore-decorators=property src
