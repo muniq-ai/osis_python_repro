@@ -14,8 +14,10 @@ jobs:
       - name: Install uv
         run: |
           pip install uv
-      - name: Install dependencies
+      - name: Create virtual environment and install dependencies
         run: |
+          uv venv
+          source .venv/bin/activate
           uv pip install -e .
           uv pip install sphinx sphinx-rtd-theme
       - name: Install pandoc
@@ -26,10 +28,9 @@ jobs:
           pandoc README.md -o README.rst
       - name: Update index.rst
         run: |
-          echo "" >> docs/index.rst
-          cat README.rst >> docs/index.rst
       - name: Sphinx build
         run: |
+          source .venv/bin/activate
           uv pip install sphinx-apidoc
           sphinx-apidoc -o docs/source src
           cd docs

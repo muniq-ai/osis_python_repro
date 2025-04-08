@@ -28,7 +28,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/uv
-        key: uv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/requirements.txt') }}
+        key: uv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/uv.lock') }}
 
     - name: Create and activate virtual environment
       run: |
@@ -38,7 +38,7 @@ jobs:
 
     - name: Install dependencies
       if: steps.cached-dependencies.outputs.cache-hit != 'true'
-      run: uv pip install -r requirements.txt
+      run: uv pip sync
 
     - name: Install project
       run: uv pip install -e .
