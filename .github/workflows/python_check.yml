@@ -2,74 +2,63 @@ name: Python Package Check
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  build:
-
+  lint-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Python 3.10
-      id: setup-python
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
 
-    - name: Install uv
-      run: pip install uv
+      - name: Install uv
+        run: pip install uv
 
-    - name: Load cached dependencies
-      id: cached-dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/uv
-        key: uv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/uv.lock') }}
+      - name: Cache uv dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('**/uv.lock') }}
 
-    - name: Create and activate virtual environment
-      run: |
-        uv venv .venv
-        echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
-        echo "$PWD/.venv/bin" >> $GITHUB_PATH
+      - name: Set up virtual environment
+        run: |
+          uv venv .venv
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
 
-    - name: Install dependencies
-      if: steps.cached-dependencies.outputs.cache-hit != 'true'
-      run: uv pip sync
+      - name: Sync dependencies
+        run: uv pip sync
 
-    - name: Install project
-      run: uv pip install -e .
+      - name: Install local project and dev tools
+        run: uv pip install -e . flake8 mypy pydocstyle coverage
 
-    - name: Install test dependencies
-      run: uv pip install flake8 mypy pydocstyle coverage
+      - name: Run tests with coverage
+        run: |
+          coverage run -m unittest discover -s tests
+          coverage report -m
+          coverage xml
 
-    - name: Run unittests
-      run: coverage run -m unittest discover -s tests
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          flags: unittests
 
-    - name: Generate coverage reports
-      run: |
-        coverage report -m
-        coverage xml
+      - name: Run Flake8
+        run: flake8 --max-line-length=88 --ignore=E203,F722,W503 src
 
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4.0.1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: unittests
+      - name: Run MyPy
+        if: always()
+        run: mypy --ignore-missing-imports --scripts-are-modules --follow-imports=skip src
 
-    - name: Run Flake8
-      run: flake8 --max-line-length=88 --ignore=E203,F722,W503 src
-
-    - name: Run MyPy
-      if: ${{ always() }}
-      run: mypy --ignore-missing-imports --scripts-are-modules --follow-imports=skip src
-
-    - name: Run Pydocstyle
-      if: ${{ always() }}
-      run: |
-        uv pip install pydocstyle
-        pydocstyle --ignore-decorators=property src
+      - name: Run Pydocstyle
+        if: always()
+        run: pydocstyle --ignore-decorators=property src

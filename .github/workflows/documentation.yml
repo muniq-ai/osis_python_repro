@@ -8,33 +8,44 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
       - name: Install uv
+        run: pip install uv
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('**/uv.lock') }}
+
+      - name: Set up virtual environment
         run: |
-          pip install uv
-      - name: Create virtual environment and install dependencies
+          uv venv .venv
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+
+      - name: Install project and Sphinx dependencies
         run: |
-          uv venv
-          source .venv/bin/activate
-          uv pip install -e . --system
-          uv pip install sphinx sphinx-rtd-theme --system
+          uv pip install -e . sphinx sphinx-rtd-theme sphinx-apidoc
+
       - name: Install pandoc
-        run: |
-          sudo apt-get install pandoc
+        run: sudo apt-get install -y pandoc
+
       - name: Convert README.md to README.rst
+        run: pandoc README.md -o README.rst
+
+      - name: Generate API docs and build HTML
         run: |
-          pandoc README.md -o README.rst
-      - name: Update index.rst
-        run: |
-      - name: Sphinx build
-        run: |
-          source .venv/bin/activate
-          uv pip install sphinx-apidoc
           sphinx-apidoc -o docs/source src
-          cd docs
-          make html
+          make -C docs html
+
       - name: Commit and push changes
         run: |
           git config --global user.name 'GitHub Actions'
@@ -42,6 +53,7 @@ jobs:
           git add docs/source/*
           git commit -m "Update Sphinx documentation" || echo "No changes to commit"
           git push origin ${GITHUB_REF} || echo "No changes to push"
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
